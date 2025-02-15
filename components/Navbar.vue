@@ -30,6 +30,12 @@ import { NuxtLink } from '#components';
           <li class="nav-item">
             <NuxtLink to="/formulas" class="nav-link">Формулы</NuxtLink>
           </li>
+          <li class="nav-item">
+            <NuxtLink to="/products" class="nav-link">Товары</NuxtLink>
+          </li>
+          <li class="nav-item">
+            <NuxtLink to="/grades" class="nav-link">Сорта</NuxtLink>
+          </li>
         </ul>
       </div>
     </div>

@@ -6,7 +6,7 @@
         <input v-model="currentFormula.name" class="form-control" placeholder="Название формулы" required />
       </div>
       <div class="mb-3">
-        <input v-model="currentFormula.formula" class="form-control" placeholder="Формула" required />
+        <textarea v-model="currentFormula.formula" class="form-control" placeholder="Формулы (JSON)" required></textarea>
       </div>
       <div class="mb-3">
         <textarea v-model="currentFormula.variables" class="form-control" placeholder="Переменные (JSON)" required></textarea>
@@ -46,13 +46,14 @@ async function fetchFormulas() {
 
 fetchFormulas() // Вызываем функцию для первоначальной загрузки данных
 
-const currentFormula = ref({ name: '', formula: '', variables: '{}' })
+const currentFormula = ref({ name: '', formula: '{}', variables: '{}' })
 const isEditing = ref(false)
 
 async function addOrUpdateFormula() {
   try {
     const payload = {
       ...currentFormula.value,
+      formula: JSON.parse(currentFormula.value.formula), // Преобразуем строку в объект
       variables: JSON.parse(currentFormula.value.variables) // Преобразуем строку в объект
     }
 
@@ -68,7 +69,7 @@ async function addOrUpdateFormula() {
       })
     }
     fetchFormulas() // Обновляем данные после изменения
-    currentFormula.value = { name: '', formula: '', variables: '{}' }
+    currentFormula.value = { name: '', formula: '{}', variables: '{}' }
     isEditing.value = false
 
   } catch (error) {
@@ -79,6 +80,7 @@ async function addOrUpdateFormula() {
 function editFormula(formula) {
   currentFormula.value = {
     ...formula,
+    formula: JSON.stringify(formula.formula), // Преобразуем объект в строку
     variables: JSON.stringify(formula.variables) // Преобразуем объект в строку
   }
   isEditing.value = true

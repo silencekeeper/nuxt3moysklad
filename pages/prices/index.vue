@@ -12,6 +12,8 @@
           <th>Формула</th>
           <th>НДС включен</th>
           <th>НДС</th>
+          <th>Продукт</th>
+          <th>Сорт</th>
           <th>Действия</th>
         </tr>
       </thead>
@@ -25,6 +27,9 @@
           <td>{{ getFormulaName(agreement.formula_id) }}</td>
           <td>{{ agreement.vat_included ? 'Да' : 'Нет' }}</td>
           <td>{{ agreement.vat_enabled ? 'Да' : 'Нет' }}</td>
+          <td>{{ getProductName(agreement.product_id) }}</td>
+          <td>{{ getGradeName(agreement.grade_id) }}</td>
+          
           <td>
             <button @click="editAgreement(agreement)" class="btn btn-sm btn-warning me-2">Редактировать</button>
             <button @click="deleteAgreement(agreement.id)" class="btn btn-sm btn-danger">Удалить</button>
@@ -61,6 +66,22 @@
           <td><input type="checkbox" v-model="currentAgreement.vat_included" /></td>
           <td><input type="checkbox" v-model="currentAgreement.vat_enabled" /></td>
           <td>
+            <select v-model="currentAgreement.product_id" class="form-control" required>
+              <option value="" disabled>Выберите продукт</option>
+              <option v-for="product in products" :key="product.id" :value="product.id">
+                {{ product.name }}
+              </option>
+            </select>
+          </td>
+          <td>
+            <select v-model="currentAgreement.grade_id" class="form-control" required>
+              <option value="" disabled>Выберите сорт</option>
+              <option v-for="grade in grades" :key="grade.id" :value="grade.id">
+                {{ grade.name }}
+              </option>
+            </select>
+          </td>
+          <td>
             <button @click="addOrUpdateAgreement" class="btn btn-sm btn-success">Добавить</button>
           </td>
         </tr>
@@ -81,6 +102,8 @@ const agreements = ref([])
 const counterparties = ref([])
 const formulas = ref([])
 const organizations = ref([])
+const products = ref([])
+const grades = ref([])
 
 const currentAgreement = ref({
   counterparty_id: '',
@@ -89,7 +112,9 @@ const currentAgreement = ref({
   organization_id: '',
   base_price: 0,
   vat_included: false,
-  vat_enabled: false
+  vat_enabled: false,
+  product_id: '',
+  grade_id: ''
 })
 const isEditing = ref(false)
 
@@ -97,6 +122,7 @@ async function fetchAgreements() {
   try {
     const response = await fetchWithAuth('/api/pricing_agreements')
     agreements.value = response
+    console.log(agreements.value)
   } catch (error) {
     console.error('Ошибка при получении ценовых соглашений:', error)
   }
@@ -129,11 +155,31 @@ async function fetchOrganizations() {
   }
 }
 
+async function fetchProducts() {
+  try {
+    const response = await fetchWithAuth('/api/products')
+    products.value = response
+  } catch (error) {
+    console.error('Ошибка при получении товаров:', error)
+  }
+}
+
+async function fetchGrades() {
+  try {
+    const response = await fetchWithAuth('/api/grades')
+    grades.value = response
+  } catch (error) {
+    console.error('Ошибка при получении сортов:', error)
+  }
+}
+
 onMounted(() => {
   fetchAgreements()
   fetchCounterparties()
   fetchFormulas()
   fetchOrganizations()
+  fetchProducts()
+  fetchGrades()
 })
 
 function validateAgreement(agreement) {
@@ -153,6 +199,12 @@ function validateAgreement(agreement) {
   }
   if (!agreement.formula_id) {
     errors.push('Формула должна быть выбрана.')
+  }
+  if (!agreement.product_id) {
+    errors.push('Продукт должен быть выбран.')
+  }
+  if (!agreement.grade_id) {
+    errors.push('Сорт должен быть выбран.')
   }
 
   return errors
@@ -185,7 +237,9 @@ async function addOrUpdateAgreement() {
       organization_id: '',
       base_price: 0,
       vat_included: false,
-      vat_enabled: false
+      vat_enabled: false,
+      product_id: '',
+      grade_id: ''
     }
     isEditing.value = false
   } catch (error) {
@@ -222,4 +276,15 @@ function getFormulaName(id) {
   const formula = formulas.value.find(f => f.id === id)
   return formula ? formula.name : 'Неизвестная формула'
 }
+
+function getProductName(id) {
+  const product = products.value.find(p => p.id === id)
+  return product ? product.name : 'Неизвестный продукт'
+}
+
+function getGradeName(id) {
+  const grade = grades.value.find(g => g.id === id)
+  return grade ? grade.name : 'Неизвестный сорт'
+}
+
 </script> 

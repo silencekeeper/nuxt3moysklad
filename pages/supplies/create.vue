@@ -51,9 +51,8 @@
             </td>
             <td>
               <select class="form-select" v-model="position.product" required>
-                <option value="">Выберите тип</option>
-                <option value="Обрат">Обрат</option>
-                <option value="Молоко сырое">Молоко сырое</option>
+                <option value="">Выберите товар</option>
+                <option v-for="product in products" :key="product.id" :value="product.id">{{ product.name }}</option>
               </select>
             </td>
             <td><input type="number" class="form-control" v-model.number="position.mass" min="0" max="999999" step="1" required></td>
@@ -85,6 +84,7 @@ const toast = useToast()
 const organizations = ref([])
 const warehouses = ref([])
 const counterparties = ref([])
+const products = ref([])
 
 const supply = reactive({
   moment: '',
@@ -107,6 +107,11 @@ async function loadWarehouses() {
 async function loadCounterparties() {
   const  data  = await fetchWithAuth('/api/counterparties')
   counterparties.value = data
+}
+
+async function loadProducts() {
+  const data = await fetchWithAuth('/api/products')
+  products.value = data
 }
 
 async function refreshOrganizations() {
@@ -255,6 +260,7 @@ async function createSupply() {
 loadOrganizations()
 loadWarehouses()
 loadCounterparties()
+loadProducts()
 </script>
 
 <style scoped>

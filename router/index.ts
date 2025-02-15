@@ -30,6 +30,14 @@ const routes = [
     path: '/formulas',
     component: () => import('~/pages/formulas/index.vue')
   },
+  {
+    path: '/products',
+    component: () => import('~/pages/products/index.vue')
+  },
+  {
+    path: '/grades',
+    component: () => import('~/pages/grades/index.vue')
+  },
   // ... другие маршруты ...
 ]
 
